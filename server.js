@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const app = express();
-var PORT = 8080;
+var PORT = process.env.PORT || 8080;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -22,10 +22,12 @@ app.post("/api/notes", (req, res) => {
         if (err) throw err;
         const jsonFile = JSON.parse(data)
         const newNotes = req.body;
-
         jsonFile.push(newNotes);
         console.log(jsonFile)
-        fs.writeFile(jsonFile)
+        fs.writeFile("db/db.json", jsonFile, "utf8", (err, data) => {
+            if(err) throw err;
+            res.json(JSON.parse(data))
+        })
     });
 
     
