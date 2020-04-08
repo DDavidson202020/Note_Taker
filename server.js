@@ -20,21 +20,45 @@ app.get("/api/notes", (req, res) => {
 app.post("/api/notes", (req, res) => {
     fs.readFile("db/db.json", "utf8", (err, data) => {
         if (err) throw err;
-        const jsonFile = JSON.parse(data)
+        let jsonFile = JSON.parse(data)
         const newNotes = req.body;
+        req.body.id = jsonFile.length + 1;
         jsonFile.push(newNotes);
-        console.log(jsonFile)
-        fs.writeFile("db/db.json", jsonFile, "utf8", (err, data) => {
+        console.log(jsonFile);
+
+        jsonFile = JSON.stringify(jsonFile);
+        fs.writeFile("db/db.json",jsonFile, "utf8", (err, data) => {
             if(err) throw err;
-            res.json(JSON.parse(data))
+           return res.json(data);
         })
+        
     });
-
-    
-    
-
-    
 });
+
+app.delete("/api/notes/:id", (req, res) => {
+    fs.readFile("db/db.json", "utf8", (err,data) => {
+        if (err) throw err;
+        let jsonFile = JSON.parse(data);
+        
+        jsonFile = jsonFile.filter(deleteNote => parseInt(req.params.id) !== deleteNote.id)
+            
+        
+        jsonFile = JSON.stringify(jsonFile);
+        fs.writeFile("db/db.json", jsonFile, "utf8", (err, data) => {
+                if (err) throw err;
+                res.json(data);
+        
+
+        })
+        
+
+    })
+})
+
+    
+    
+
+
 // Sending the notes.html page back for the get request (HTML route)
 app.get("/notes", (req, res) => {
     return res.sendFile(path.join(__dirname, "public/notes.html"));
