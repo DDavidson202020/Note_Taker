@@ -25,14 +25,17 @@ app.post("/api/notes", (req, res) => {
     fs.readFile("db/db.json", "utf8", (err, data) => {
         // Throw an error if there is any error
         if (err) throw err;
-        // Create a variable that stores the data after 
+        // Create a variable that stores the data after it parse into an array of objects
         let jsonFile = JSON.parse(data)
         const newNotes = req.body;
+        // Set up the id property 
         req.body.id = jsonFile.length + 1;
+        // Push new notes(new info) from user to json file
         jsonFile.push(newNotes);
         console.log(jsonFile);
-
+        // Stringify the array of object file(json file) to make it into a string to wrire a file with it
         jsonFile = JSON.stringify(jsonFile);
+        // Write file( overwrite) the json file
         fs.writeFile("db/db.json",jsonFile, "utf8", (err) => {
             if(err) throw err;
            
@@ -40,30 +43,27 @@ app.post("/api/notes", (req, res) => {
         return res.json(data);
     });
 });
-
+// API delete route
 app.delete("/api/notes/:id", (req, res) => {
+    // Read the json file
     fs.readFile("db/db.json", "utf8", (err,data) => {
+        // Throw error if there's any
         if (err) throw err;
+        // Parse json file into an array of objects
         let jsonFile = JSON.parse(data);
-        
+        // Filter out the json array to get rid of the notes that user deletes
         jsonFile = jsonFile.filter(deleteNote => parseInt(req.params.id) !== deleteNote.id)
             
-        
+        // Stringify the json file to make it into a string for writeFile
         jsonFile = JSON.stringify(jsonFile);
+        // Write (overwrite) the json file after it's been filtered out 
         fs.writeFile("db/db.json", jsonFile, "utf8", (err) => {
                 if (err) throw err;
-                
-        
-
         })
         
-        res.json(data);
+        return res.json(data);
     })
 })
-
-    
-    
-
 
 // Sending the notes.html page back for the get request (HTML route)
 app.get("/notes", (req, res) => {
